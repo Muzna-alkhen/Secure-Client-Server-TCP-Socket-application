@@ -1,62 +1,62 @@
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 // Client class 
 public class Client
 {
-    public static void main(String[] args) throws IOException
-    {
-        try
-        {
+    public static void main(String[] args) throws IOException {
+        try {
+
+            System.out.println("Enter server ip,Server port ,file name,action,new text if EDIT or Null");
+            System.out.println("Or type Exit to terminate the connection !");
             Scanner scn1 = new Scanner(System.in);
-            System.out.println("Enter server ip");
-            String ip = scn1.nextLine();
-            System.out.println("Enter server port");
-            int port = scn1.nextInt();
+            String request = scn1.nextLine();
+            String response = "";
+            String[] tokens = request.split(",");
+            String ip = tokens[0];
+            String port = tokens[1];
 
             // getting localhost ip
             InetAddress ipAdd = InetAddress.getByName(ip);
-
             // establish the connection with server port 5056
-            Socket s = new Socket(ip, port);
-
-            // obtaining input and out streams
-            DataInputStream dis = new DataInputStream(s.getInputStream());
-            DataOutputStream dos = new DataOutputStream(s.getOutputStream());
-
+            Socket socket = new Socket(ip, Integer.parseInt(port));
+            // obtaining request and out streams
+            Scanner in = new Scanner(socket.getInputStream());
+            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
             // the following loop performs the exchange of
             // information between client and client handler
-            Scanner scn2 = new Scanner(System.in);
-            while (true )
+            boolean firstRequest = true;
+            while (true)
+            // If client sends exit,close this connection
+            // and then break from the while loop
             {
-                System.out.println(dis.readUTF());
-                String tosend = scn2.nextLine();
-                dos.writeUTF(tosend);
-
-                // If client sends exit,close this connection
-                // and then break from the while loop
-                if(tosend.equals("Exit"))
-                {
-                    System.out.println("Closing this connection : " + s);
-                    s.close();
+                System.out.println(in.nextLine());
+                if(! firstRequest)
+                {request = scn1.nextLine();}
+                out.println(request);
+                firstRequest =false;
+                if (request.equals("Exit")) {
+                    System.out.println("Closing this connection : " + socket);
+                    socket.close();
                     System.out.println("Connection closed");
                     break;
                 }
+                response = in.nextLine();
+                System.out.println(response);
 
-                // printing date or time as requested by client
-                String received = dis.readUTF();
-                System.out.println(received);
+
             }
-
             // closing resources
             scn1.close();
-            scn2.close();
-            dis.close();
-            dos.close();
-        }catch(Exception e){
+            out.close();
+            in.close();
+        } catch (Exception e) {
             e.printStackTrace();
-        }
+    }
     }
 
 

@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.*;
+import java.util.Scanner;
 
 
 // Server class 
@@ -9,8 +10,7 @@ public class Server
     {
         // server is listening on port 5056 
         ServerSocket serverSocket = new ServerSocket(5056);
-
-        // running infinite loop for getting 
+        // running infinite loop for getting
         // client request 
         while (true)
         {
@@ -19,20 +19,16 @@ public class Server
             {
                 // socket object to receive incoming client requests 
                 socket = serverSocket.accept();
+                // obtaining input and out streams
+                Scanner in = new Scanner(socket.getInputStream());
+                PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+
                 System.out.println("A new client is connected : " + socket);
-
-                // obtaining input and out streams 
-                DataInputStream dis = new DataInputStream(socket.getInputStream());
-                DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
-
                 System.out.println("Assigning new thread for this client");
-
                 // create a new thread object 
-                Thread thread = new ClientHandler(socket, dis, dos);
-
+                Thread thread = new ClientHandler(socket, in, out);
                 // Invoking the start() method 
                 thread.start();
-
             }
             catch (Exception e){
                 socket.close();
