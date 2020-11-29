@@ -1,9 +1,13 @@
-import java.io.*;
-import java.net.*;
+package SymmeticEncryptionApp;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.Scanner;
 
 
-// Server class 
+// NonSecureApp.Server class
 public class Server
 {
     public static void main(String[] args) throws IOException

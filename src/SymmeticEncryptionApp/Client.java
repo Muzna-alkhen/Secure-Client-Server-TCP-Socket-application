@@ -1,18 +1,18 @@
-import java.io.*;
-import java.net.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+package SymmeticEncryptionApp;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.util.Scanner;
 
-// Client class 
+// NonSecureApp.Client class
 public class Client
 {
     public static void main(String[] args) throws IOException {
         try {
 
-            System.out.println("Enter server ip,Server port ,file name,action,new text if EDIT or Null");
-            System.out.println("Or type Exit to terminate the connection !");
+            System.out.println("Enter server ip,NonSecureApp.Server port ,file name,action,new text if EDIT or Null");
             Scanner scn1 = new Scanner(System.in);
             String request = scn1.nextLine();
             String response = "";
@@ -47,7 +47,6 @@ public class Client
                 }
                 response = in.nextLine();
                 System.out.println(response);
-
 
             }
             // closing resources

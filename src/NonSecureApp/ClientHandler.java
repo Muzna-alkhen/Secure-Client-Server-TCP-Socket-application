@@ -1,3 +1,5 @@
+package NonSecureApp;
+
 import java.io.*;
 import java.net.Socket;
 import java.text.DateFormat;
@@ -7,7 +9,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
-// ClientHandler class
+// NonSecureApp.ClientHandler class
 class ClientHandler extends Thread
 {
 
@@ -38,7 +40,7 @@ class ClientHandler extends Thread
                 request = in.nextLine();
                 firstRequest=false;
                 if (request.equals("Exit")) {
-                    System.out.println("Client " + this.socket + " sends exit...");
+                    System.out.println("NonSecureApp.Client " + this.socket + " sends exit...");
                     System.out.println("Closing this connection.");
                     this.socket.close();
                     System.out.println("Connection closed");
@@ -49,12 +51,22 @@ class ClientHandler extends Thread
                 String[] tokens= request.split(",");
                 String fileName = tokens[2];
                 String action = tokens[3];
-                String edit = "";
+                String edit = tokens[4];
                 if (action.equals("edit"))
                 {
-                    edit = tokens[4];
+                  response= writeFile(fileName,edit);
                 }
-                response = readFile(fileName);
+                else
+                {
+                    if (action.equals("view"))
+                    {
+                        response = readFile(fileName);
+                    }
+                    else
+                    {
+                       response="Invalid Action !";
+                    }
+                }
                 out.println(response);
 
                 } catch (IOException e) {
@@ -73,15 +85,16 @@ class ClientHandler extends Thread
         try {
             File fileObj = new File("C:\\Users\\HP\\Downloads\\ISS homework\\" + name + ".txt");
             if (fileObj.exists()) {
+                content ="Reading File Succeed!-->";
                 Scanner myReader = new Scanner(fileObj);
                 while (myReader.hasNextLine()) {
-                    content = content + myReader.nextLine();
+                    content =content + myReader.nextLine();
 
                 }
                 myReader.close();
             }
             else
-            {content = "File NOT Found ! ";}
+            {content = "Reading File Failed!-->File NOT Found!";}
         }
 
         catch (FileNotFoundException e) {
@@ -91,5 +104,41 @@ class ClientHandler extends Thread
 
 
         return content;
+    }
+    public static String  writeFile(String name , String edit)
+    {
+        String content = "";
+        try {
+            File file = new File("C:\\Users\\HP\\Downloads\\ISS homework\\" + name + ".txt");
+            if (file.exists()) {
+            FileWriter fWriter = new FileWriter(file);
+            FileReader fileReader = new FileReader(file);
+            fWriter.write(edit);
+            fWriter.close();
+             content = "File Editing Succeed!--> " +readFile(name);
+
+            }
+            else
+            {
+                File newFile = new File("C:\\Users\\HP\\Downloads\\ISS homework\\" + name + ".txt");
+                Boolean isCreated = newFile.createNewFile();
+                if (isCreated)
+                {    FileWriter fWriter = new FileWriter(newFile);
+                    FileReader fileReader = new FileReader(newFile);
+                    fWriter.write(edit);
+                    fWriter.close();
+                    content =  "File NOT Found,File Creation Succeed!-->"+readFile(name);}
+                else
+                {content =  "File NOT Found, File Creation Failed!";}
+            }
+        }
+
+        catch (FileNotFoundException e) {
+            System.out.println("File Not Found ! ");
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return  content;
     }
 } 
