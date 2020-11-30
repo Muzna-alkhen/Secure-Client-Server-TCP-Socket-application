@@ -16,7 +16,7 @@ public class Client
             System.out.println("Enter server ip,Server port ,file name,action,new text if EDIT or Null");
             Scanner scn1 = new Scanner(System.in);
             String request = scn1.nextLine();
-            String response = "";
+            String response,encResponse,encRequest = "";
             String[] tokens = request.split(",");
             String ip = tokens[0];
             String port = tokens[1];
@@ -35,10 +35,16 @@ public class Client
             // If client sends exit,close this connection
             // and then break from the while loop
             {
+
                 System.out.println(in.nextLine());
                 if(! firstRequest)
-                {request = scn1.nextLine();}
-                out.println(request);
+                {
+                    request = scn1.nextLine();
+                }
+                //encrypt the request
+                encRequest = Symmetric.encrypt(request);
+               // System.out.println(encRequest);
+                out.println(encRequest);
                 firstRequest =false;
                 if (request.equals("Exit")) {
                     System.out.println("Closing this connection : " + socket);
@@ -46,7 +52,9 @@ public class Client
                     System.out.println("Connection closed");
                     break;
                 }
-                response = in.nextLine();
+                encResponse = in.nextLine();
+                System.out.println(encResponse);
+                response = Symmetric.decrypt(encResponse);
                 System.out.println(response);
 
             }

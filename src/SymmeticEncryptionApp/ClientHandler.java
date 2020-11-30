@@ -30,6 +30,8 @@ class ClientHandler extends Thread
     public void run() {
         String request = "";
         String response = "";
+        String  encRequest ="";
+        String encResponse="";
         boolean firstRequest = true;
         while (true) {
             try {
@@ -37,7 +39,9 @@ class ClientHandler extends Thread
                 {out.println("You Are Connected !");}
                 else
                 {out.println("enter a new REQUEST or Exit ..");}
-                request = in.nextLine();
+                 encRequest = in.nextLine();
+             //   System.out.println(encRequest);
+                request = Symmetric.decrypt(encRequest);
                 firstRequest=false;
                 if (request.equals("Exit")) {
                     System.out.println("NonSecureApp.Client " + this.socket + " sends exit...");
@@ -46,7 +50,7 @@ class ClientHandler extends Thread
                     System.out.println("Connection closed");
                     break;
                 }
-                System.out.println("Request is " +request);
+               System.out.println("Request is " +encRequest);
                 //split the request
                 String[] tokens= request.split(",");
                 String fileName = tokens[2];
@@ -67,7 +71,9 @@ class ClientHandler extends Thread
                         response="Invalid Action !";
                     }
                 }
-                out.println(response);
+                 encResponse = Symmetric.encrypt(response);
+                 System.out.println(encResponse);
+                out.println(encResponse);
 
             } catch (IOException e) {
                 e.printStackTrace();
