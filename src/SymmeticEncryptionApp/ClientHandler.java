@@ -32,6 +32,10 @@ class ClientHandler extends Thread
         String response = "";
         String  encRequest ="";
         String encResponse="";
+        String action = "";
+        String fileName="";
+        String[] tokens ;
+        String edit="";
         boolean firstRequest = true;
         while (true) {
             try {
@@ -42,7 +46,7 @@ class ClientHandler extends Thread
                  encRequest = in.nextLine();
              //   System.out.println(encRequest);
                 request = Symmetric.decrypt(encRequest);
-                firstRequest=false;
+
                 if (request.equals("Exit")) {
                     System.out.println("NonSecureApp.Client " + this.socket + " sends exit...");
                     System.out.println("Closing this connection.");
@@ -50,12 +54,21 @@ class ClientHandler extends Thread
                     System.out.println("Connection closed");
                     break;
                 }
-               System.out.println("Request is " +encRequest);
+               System.out.println("Request is " +request);
                 //split the request
-                String[] tokens= request.split(",");
-                String fileName = tokens[2];
-                String action = tokens[3];
-                String edit = tokens[4];
+                if (firstRequest)
+                {    tokens= request.split(",");
+                     fileName = tokens[2];
+                     action = tokens[3];
+                     edit = tokens[4];
+                }
+                else
+                {   tokens= request.split(",");
+                     fileName = tokens[0];
+                     action = tokens[1];
+                     edit = tokens[2];
+              }
+                System.out.println("action is " +action);
                 if (action.equals("edit"))
                 {
                     response= writeFile(fileName,edit);
@@ -73,6 +86,7 @@ class ClientHandler extends Thread
                 }
                  encResponse = Symmetric.encrypt(response);
                  System.out.println(encResponse);
+                 firstRequest = false;
                 out.println(encResponse);
 
             } catch (IOException e) {
