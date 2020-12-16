@@ -45,7 +45,7 @@ public class Client
 
             //send  client public key to server
             PublicKey publicKey = keyPair.getPublic();
-            out.println(Asymmetric.convertPublicKeyToString(publicKey));
+            out.println(Asymmetric.convertKeyToString(publicKey));
 
             //receive server public key
              String serverPublicKeyString = in.nextLine();

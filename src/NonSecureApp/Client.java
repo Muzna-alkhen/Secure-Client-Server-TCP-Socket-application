@@ -12,7 +12,6 @@ public class Client
 {
     public static void main(String[] args) throws IOException {
         try {
-
             System.out.println("Enter server ip,NonSecureApp.Server port ,file name,action,new text if EDIT or Null");
             Scanner scn1 = new Scanner(System.in);
             String request = scn1.nextLine();

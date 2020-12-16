@@ -44,7 +44,7 @@ class ClientHandler extends Thread
                 else
                 {out.println("enter a new REQUEST or Exit ..");}
                  encRequest = in.nextLine();
-             //   System.out.println(encRequest);
+                System.out.println(encRequest);
                 request = Symmetric.decrypt(encRequest);
 
                 if (request.equals("Exit")) {

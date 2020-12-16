@@ -1,12 +1,11 @@
-package HybirdEncryptionApp;
+package DigitalSignature;
 
+import javax.crypto.Cipher;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Scanner;
-
-import javax.crypto.Cipher;
 
 public class Asymmetric {
 
@@ -16,21 +15,12 @@ public class Asymmetric {
 
     // Generating public & private keys
     // using RSA algorithm.
-    public  static String convertKeyToString(PublicKey key)
+    public  static String convertPublicKeyToString (PublicKey publicKey)
 
     {
-        byte[] keyByte = key.getEncoded();
-        String keyString = Base64.getEncoder().encodeToString(keyByte);
-        return keyString;
-
-    }
-
-    public  static String convertKeyToString(PrivateKey key)
-
-    {
-        byte[] keyByte = key.getEncoded();
-        String keyString = Base64.getEncoder().encodeToString(keyByte);
-        return keyString;
+        byte[] publicKeyByte = publicKey.getEncoded();
+        String publicKeyString = Base64.getEncoder().encodeToString(publicKeyByte);
+        return publicKeyString;
 
     }
     public static PublicKey convertPublicKeyToObject(String s) throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchProviderException {

@@ -43,7 +43,7 @@ public class Client
                 }
                 //encrypt the request
                 encRequest = Symmetric.encrypt(request);
-               // System.out.println(encRequest);
+                System.out.println(encRequest);
                 out.println(encRequest);
                 firstRequest =false;
                 if (request.equals("Exit")) {

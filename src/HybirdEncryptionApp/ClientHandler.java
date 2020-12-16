@@ -70,7 +70,7 @@ class ClientHandler extends Thread
 
         //send public key to client
         publicKey = keyPair.getPublic();
-        out.println(Asymmetric.convertPublicKeyToString(publicKey));
+        out.println(Asymmetric.convertKeyToString(publicKey));
 
         //receive encrypted session key from client
         String encSessionKeyString = in.nextLine();

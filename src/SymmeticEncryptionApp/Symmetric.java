@@ -44,10 +44,8 @@ public class Symmetric {
     public static String decrypt(String encryptedMessage) {
         try {
             byte[] bytes = DatatypeConverter.parseBase64Binary(encryptedMessage);
-
             byte[] iv = getIV(bytes);
             byte[] cipherText = getCipherText(bytes);
-
             Cipher cipher = Cipher.getInstance("AES/CTR/NoPadding");
             cipher.init(Cipher.DECRYPT_MODE, skeySpec, new IvParameterSpec(iv));
 
