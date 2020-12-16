@@ -1,5 +1,6 @@
 package DigitalSignature;
 
+import HybirdEncryptionApp.Asymmetric;
 import SymmeticEncryptionApp.Symmetric;
 import com.sun.source.util.SourcePositions;
 
@@ -19,14 +20,17 @@ class ClientHandler extends Thread
     final Scanner in;
     final PrintWriter out;
     final Socket socket;
-
+    final PublicKey publicKey ;
+    final PrivateKey privateKey;
 
     // Constructor
-    public ClientHandler(Socket s, Scanner in, PrintWriter out)
+    public ClientHandler(Socket s, Scanner in, PrintWriter out,PublicKey publicKey,PrivateKey privateKey)
     {
         this.socket = s;
         this.in = in;
         this.out = out;
+        this.publicKey = publicKey;
+        this.privateKey= privateKey;
     }
 
     @Override
@@ -51,56 +55,80 @@ class ClientHandler extends Thread
         Boolean isHashedEqual;
         PublicKey clientPublicKey = null;
         String encResponse;
+        String publicKeyString;
 
         //sending first response
         out.println("You Are Connected !Enter your username and NationalID :");
         ////////////////////////////
-        //generate key pair
-        KeyPair keyPair = null;
-        try {
-            keyPair = Asymmetric.generateRSAKkeyPair();
-        } catch (Exception e) {
-            e.printStackTrace();
+
+        //reading client national id
+        nationalId =in.nextLine();
+        File file = new File("C:\\Users\\HP\\Downloads\\ISS homework\\server\\clients\\"+nationalId+".txt");
+        if (file.exists())
+        {
+            System.out.println("NOT First Connection ! ");
+            Scanner myReader = null;
+            try {
+                myReader = new Scanner(file);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            clientPublicKeyString = myReader.nextLine();
+            myReader.close();
+            try {
+                clientPublicKey =  Asymmetric.convertPublicKeyToObject(clientPublicKeyString);
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            } catch (InvalidKeySpecException e) {
+                e.printStackTrace();
+            } catch (NoSuchProviderException e) {
+                e.printStackTrace();
+            }
+
         }
-        PublicKey publicKey = keyPair.getPublic();
-        PrivateKey privateKey = keyPair.getPrivate();
-        //storing my public-private keys
-        String publicKeyString = HybirdEncryptionApp.Asymmetric.convertKeyToString(publicKey);
-        String privateKeyString = HybirdEncryptionApp.Asymmetric.convertKeyToString(privateKey);
-        File file = new File ("C:\\Users\\HP\\Downloads\\ISS homework\\server\\server.txt");
-        FileWriter writer = null;
-        try {
-            file.createNewFile();
-            writer = new FileWriter(file);
-            writer.write(publicKeyString+"\n");
-            writer.write(privateKeyString+"\n");
-            writer.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-       //receive client's public key
-        clientPublicKeyString = in.nextLine();
-        try {
-             clientPublicKey =  HybirdEncryptionApp.Asymmetric.convertPublicKeyToObject(clientPublicKeyString);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-        } catch (NoSuchProviderException e) {
-            e.printStackTrace();
-        }
-        //storing client public key
-        File clientsFile = new File("C:\\Users\\HP\\Downloads\\ISS homework\\server\\clientsInfo.txt");
-        try {
-            FileWriter clientsWriter = new FileWriter(clientsFile,true);
-            if ( ! (find (clientsFile,clientPublicKeyString)))
-            {  clientsWriter.write(clientPublicKeyString+"\n"); }
-            clientsWriter.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        else
+        {
+            System.out.println(" First Connection ! ");
+            //receive client's public key
+            clientPublicKeyString = in.nextLine();
+            try {
+                clientPublicKey =  HybirdEncryptionApp.Asymmetric.convertPublicKeyToObject(clientPublicKeyString);
+            } catch (NoSuchAlgorithmException e) {
+                e.printStackTrace();
+            } catch (InvalidKeySpecException e) {
+                e.printStackTrace();
+            } catch (NoSuchProviderException e) {
+                e.printStackTrace();
+            }
+            //storing client public key to new file
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            FileWriter writer = null;
+            try {
+                writer = new FileWriter(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                writer.write(clientPublicKeyString + "\n");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
         }
 
+
         //send my public key
+        publicKeyString = Asymmetric.convertKeyToString(this.publicKey);
         out.println(publicKeyString);
       System.out.println("Client public key is:\n"+clientPublicKeyString);
 
@@ -108,10 +136,9 @@ class ClientHandler extends Thread
         String encSessionKeyString = in.nextLine();
         //decrypt session key by the private key
         byte[] encSessionKeyByte = Base64.getDecoder().decode(encSessionKeyString);
-        privateKey =keyPair.getPrivate();
         String sessionKeyString="";
         try {
-            sessionKeyString = HybirdEncryptionApp.Asymmetric.decrypt(encSessionKeyByte,privateKey);
+            sessionKeyString = HybirdEncryptionApp.Asymmetric.decrypt(encSessionKeyByte,this.privateKey);
         } catch (Exception e) {
             e.printStackTrace();
         }

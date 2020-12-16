@@ -2,6 +2,7 @@ package HybirdEncryptionApp;
 
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
+import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.Scanner;
@@ -49,6 +50,35 @@ public class Asymmetric {
         }
   return publicKey;
     }
+
+
+
+
+    public static PrivateKey convertPrivateKeyToObject(String s) {
+        byte []  privateKeyByte =  Base64.getDecoder().decode(s);
+        KeyFactory factory = null;
+        try {
+            factory = KeyFactory.getInstance("RSA");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        PrivateKey privateKey = null;
+        try {
+            privateKey =  factory.generatePrivate(new PKCS8EncodedKeySpec(privateKeyByte));
+        } catch (InvalidKeySpecException e) {
+            e.printStackTrace();
+        }
+        return privateKey;
+    }
+
+
+
+
+
+
+
+
+
 
     public static KeyPair generateRSAKkeyPair()
             throws Exception
@@ -141,4 +171,6 @@ public class Asymmetric {
                 "The decrypted text is: "
                         + decryptedText);*/
     }
+
+
 }

@@ -1,6 +1,7 @@
 package DigitalSignature;
 
 // Imports
+import java.io.File;
 import java.math.BigInteger;
 import java.security.*;
 import java.util.Base64;
@@ -79,7 +80,10 @@ public class DigitalSignature {
     public static void main(String args[])
             throws Exception
     {
-
+        File file = new File("C:\\Users\\HP\\Downloads\\ISS homework\\server", "server.txt");
+        boolean check = file.exists();
+        System.out.println(check);
+        /*
         String input
                 = "GEEKSFORGEEKS IS A"
                 + " COMPUTER SCIENCE PORTAL";
@@ -87,7 +91,7 @@ public class DigitalSignature {
                 = Generate_RSA_KeyPair();
 
         // Function Call
-   /*     byte[] signature
+       byte[] signature
                 = Create_Digital_Signature(
                 input.getBytes(),
                 keyPair.getPrivate());

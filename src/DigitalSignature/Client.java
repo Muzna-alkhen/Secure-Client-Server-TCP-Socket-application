@@ -31,6 +31,11 @@ public class Client {
             String hashedRequest ="";
             String fullRequest = "";
             String encResponse = "";
+            KeyPair keyPair ;
+            PublicKey publicKey ;
+            PrivateKey privateKey ;
+            String publicKeyString;
+            String privateKeyString;
 
             // getting localhost ip
             InetAddress ipAdd = InetAddress.getByName(ip);
@@ -44,40 +49,53 @@ public class Client {
 
             //receive that the connection is done
             System.out.println(in.nextLine() + "\n-------------------");
-
-            //generate key pair
-            KeyPair keyPair = Asymmetric.generateRSAKkeyPair();
-            PublicKey publicKey = keyPair.getPublic();
-            PrivateKey privateKey = keyPair.getPrivate();
-            //storing my username and nationalId
+            //getting my username and nationalId
             String username = scn1.nextLine();
             String nationalId = scn1.nextLine();
-            //sign the username and nation Id via privte key
+
+            //send national Id to server
+            out.println(nationalId);
+            File file = new File("C:\\Users\\HP\\Downloads\\ISS homework\\clients\\"+nationalId+".txt");
+            // - NOT first connection with server-
+            if (file.exists())
+            {
+                Scanner myReader = new Scanner(file);
+
+                  publicKeyString = myReader.nextLine();
+                  privateKeyString =myReader.nextLine();
+                myReader.close();
+                publicKey =  HybirdEncryptionApp.Asymmetric.convertPublicKeyToObject(publicKeyString);
+                privateKey = HybirdEncryptionApp.Asymmetric.convertPrivateKeyToObject(privateKeyString);
+
+        }
+        // -first connection with server-
+            else
+            {
+                //generate key pair
+                 keyPair = Asymmetric.generateRSAKkeyPair();
+                 publicKey = keyPair.getPublic();
+                 privateKey = keyPair.getPrivate();
+                 //storing keys to new file
+                file.createNewFile();
+                FileWriter writer = new FileWriter(file);
+                 publicKeyString = HybirdEncryptionApp.Asymmetric.convertKeyToString(publicKey);
+                 privateKeyString = HybirdEncryptionApp.Asymmetric.convertKeyToString(privateKey);
+                writer.write(publicKeyString + "\n");
+                writer.write(privateKeyString + "\n");
+                //send public key to server
+                out.println(publicKeyString);
+                writer.close();
+
+            }
+
+
+            //sign the username and nation Id via private key
             String signature = DigitalSignature.Create_Digital_Signature(username+nationalId,privateKey);
-            String publicKeyString = HybirdEncryptionApp.Asymmetric.convertKeyToString(publicKey);
-            String privateKeyString = HybirdEncryptionApp.Asymmetric.convertKeyToString(privateKey);
-            File file = new File("C:\\Users\\HP\\Downloads\\ISS homework\\clients\\"+username+".txt");
-            file.createNewFile();
-            FileWriter writer = new FileWriter(file);
-            writer.write(signature + "\n");
-            writer.write(publicKeyString + "\n");
-            writer.write(privateKeyString + "\n");
 
-
-            //send public key to server
-            out.println(publicKeyString);
             //receive server public key
             String serverPublicKeyString = in.nextLine();
             PublicKey serverPublicKey =  HybirdEncryptionApp.Asymmetric.convertPublicKeyToObject(serverPublicKeyString);
             System.out.println("My public key is:"+publicKeyString+"\n");
-            //storing server public key to file
-            writer.write(serverPublicKeyString + "\n");
-            writer.close();
-           /* //hashing username and nationalId
-            String hashed = hash(username+ nationalId);
-            //send hashed username and nationalId
-            out.println(hashed);
-            System.out.println("hashed is : \n"+hashed);*/
 
             //generating session key
             SecretKey sessionKey = Symmetric.createAESKey();
