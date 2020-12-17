@@ -37,6 +37,14 @@ public class Client {
             String publicKeyString;
             String privateKeyString;
             String encHashedRequest;
+            String hashedResponse;
+            String encHashedResponse;
+            String fullResponse;
+            String serverSignature = null;
+            String [] fullTokens ;
+            String serverName;
+            Boolean isVerify = null;
+            Boolean isHashedEqual;
 
 
             // getting localhost ip
@@ -129,9 +137,33 @@ public class Client {
                 fullRequest = encRequest+","+encHashedRequest+","+username+","+nationalId+","+signature;
                 System.out.println(fullRequest);
                 out.println(fullRequest);
-                 encResponse = in.nextLine();
-                response =Symmetric.decrypt(encResponse,sessionKey);
-                System.out.println(response+"\n-------------------");
+                ///////////// response
+                 fullResponse = in.nextLine();
+                 fullTokens = fullResponse.split(",");
+                 encResponse=fullTokens[0];
+                 encHashedResponse=fullTokens[1];
+                 serverName=fullTokens[2];
+                 serverSignature=fullTokens[3];
+                 response = Symmetric.decrypt(encResponse,sessionKey);
+                 hashedResponse = Symmetric.decrypt(encHashedResponse,sessionKey);
+                //verify the signature
+                try {
+                    isVerify = DigitalSignature.Verify_Digital_Signature(serverName,serverSignature,serverPublicKey);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                //verify the hash
+                isHashedEqual= hashedResponse.equals(DigitalSignature.hash(response));
+                 if ( (isVerify) && (isHashedEqual))
+                 {
+                     System.out.println("*** Server Verified !! ***");
+                     System.out.println(response);
+                 }
+                 else
+                {
+                    System.out.println("*** Server NOT Verified !! ***");
+                }
+
 
             }
 

@@ -56,6 +56,17 @@ class ClientHandler extends Thread
         String encResponse;
         String publicKeyString;
         String hashedRequest;
+        String hashedResponse;
+        String encHashedResponse;
+        String fullResponse;
+        String serverSignature = null;
+
+        //sign the SERVER name via private key
+        try {
+             serverSignature = DigitalSignature.Create_Digital_Signature("google",this.privateKey);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         //sending first response
         out.println("You Are Connected !Enter your username and NationalID :");
@@ -212,7 +223,11 @@ class ClientHandler extends Thread
                 response ="*** NOOOOOOT Verified ***";
             }
             encResponse = Symmetric.encrypt(response,sessionKey);
-            out.println(encResponse);
+            hashedResponse = DigitalSignature.hash(response);
+            encHashedResponse = Symmetric.encrypt(hashedResponse,sessionKey);
+            fullResponse = encResponse+","+encHashedResponse+","+"google"+","+serverSignature;
+
+            out.println(fullResponse);
 
         }
 

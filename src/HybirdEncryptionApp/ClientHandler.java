@@ -18,14 +18,18 @@ class ClientHandler extends Thread
     final Scanner in;
     final PrintWriter out;
     final Socket socket;
+    final PublicKey publicKey ;
+    final PrivateKey privateKey;
 
 
     // Constructor
-    public ClientHandler(Socket s, Scanner in, PrintWriter out)
+    public ClientHandler(Socket s, Scanner in, PrintWriter out,PublicKey publicKey,PrivateKey privateKey)
     {
         this.socket = s;
         this.in = in;
         this.out = out;
+        this.publicKey = publicKey;
+        this.privateKey= privateKey;
     }
 
     @Override
