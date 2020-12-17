@@ -2,7 +2,6 @@ package DigitalSignature;
 
 import HybirdEncryptionApp.Asymmetric;
 import SymmeticEncryptionApp.Symmetric;
-import com.sun.source.util.SourcePositions;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -47,7 +46,7 @@ class ClientHandler extends Thread
         String clientPublicKeyString="";
         String fullRequest ="";
         String encRequest ="";
-        String hashedRequest = "";
+        String encHashedRequest = "";
         String signature="";
         String username ;
         String nationalId;
@@ -56,6 +55,7 @@ class ClientHandler extends Thread
         PublicKey clientPublicKey = null;
         String encResponse;
         String publicKeyString;
+        String hashedRequest;
 
         //sending first response
         out.println("You Are Connected !Enter your username and NationalID :");
@@ -154,13 +154,14 @@ class ClientHandler extends Thread
             //split the full request
             fullTokens= fullRequest.split(",");
             encRequest = fullTokens[0];
-            hashedRequest =fullTokens[1];
+            encHashedRequest =fullTokens[1];
             username =fullTokens[2];
             nationalId =fullTokens[3];
             signature =fullTokens[4];
-            System.out.println(encRequest+"\n"+hashedRequest+"\n"+username+"\n"+nationalId+"\n"+signature);
+            System.out.println(encRequest+"\n"+ encHashedRequest +"\n"+username+"\n"+nationalId+"\n"+signature);
             //decrypt the request by session key
             request = Symmetric.decrypt(encRequest,sessionKey);
+            hashedRequest = Symmetric.decrypt(encHashedRequest,sessionKey);
             //verify the signature
             try {
                 isVerify = DigitalSignature.Verify_Digital_Signature(username+nationalId,signature,clientPublicKey);
@@ -171,7 +172,7 @@ class ClientHandler extends Thread
 
             if ( (isVerify) && (isHashedEqual))
             {
-                response ="*** Verified ***";
+                System.out.println("*** Verified ***");
                 request = Symmetric.decrypt(encRequest,sessionKey);
 
             if (request.equals("Exit")) {
@@ -215,29 +216,6 @@ class ClientHandler extends Thread
 
         }
 
-/*
-            fileName = tokens[0];
-            action = tokens[1];
-            edit = tokens[2];
-            if(request.equals("exit"))
-            {
-                System.out.println("Client " + this.socket + " sends exit..."+"\n-------------------");
-                System.out.println("Closing this connection."+"\n-------------------");
-                try {
-                    this.socket.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                System.out.println("Connection closed"+"\n-------------------");
-                break;
-            }
-            else
-            {
-
-
-            }
-
-        }*/
         }
 
 

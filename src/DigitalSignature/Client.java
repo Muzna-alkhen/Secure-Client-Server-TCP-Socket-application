@@ -36,6 +36,8 @@ public class Client {
             PrivateKey privateKey ;
             String publicKeyString;
             String privateKeyString;
+            String encHashedRequest;
+
 
             // getting localhost ip
             InetAddress ipAdd = InetAddress.getByName(ip);
@@ -121,7 +123,10 @@ public class Client {
                 }
                 encRequest = Symmetric.encrypt(request,sessionKey);
                 hashedRequest = DigitalSignature.hash(request);
-                fullRequest = encRequest+","+hashedRequest+","+username+","+nationalId+","+signature;
+                encHashedRequest = Symmetric.encrypt(hashedRequest,sessionKey);
+
+
+                fullRequest = encRequest+","+encHashedRequest+","+username+","+nationalId+","+signature;
                 System.out.println(fullRequest);
                 out.println(fullRequest);
                  encResponse = in.nextLine();
